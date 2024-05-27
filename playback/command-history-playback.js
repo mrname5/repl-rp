@@ -3,6 +3,8 @@
 // --------------------------------------------------------------------------
 //Code helped by AI
 
+//IMPORTANT: FORGOT TO IGNORE SENTANCES WHICH START WITH * WHICH ARE COMMENTS. IN OTHER WORDS FORGOT COMMENTS WHICH START WITH *
+
 // Works as long as all dependencies are there.
 // Tried using eval to use require and await import. DID not work require and await import only works in top level modules not meant to be called programmatically
 // Tried using .load 
@@ -48,6 +50,22 @@ class CommandHistoryPlayer {
         this.lastTime = this.playbackFile.startTime
         this.combineWithCurrentCommand = ''
         this.waitFor = undefined
+        this.verbosity = false
+    }
+    logIfVerbose (){
+        if (this.verbosity === false){
+            return false
+        }
+        else if (arguments.length > 1){
+            let combinedString = ''
+            Object.values(arguments).forEach(x => {combinedString += x + ' '})
+            console.log(combinedString)
+            return true
+        }
+        else {
+            console.log(arguments[0])
+            return true
+        }
     }
     play (){
         if (this.checkForWaitFor() === false){
@@ -57,15 +75,18 @@ class CommandHistoryPlayer {
         this.scheduleNextAction()
         this.waitFor = undefined
         this.waitingFor = undefined
+        this.logIfVerbose('Playing')
     }
     stop (){
         this.state = 'stopped'
+        this.logIfVerbose('Stopped')
     }
     repeat (){
         this.actionIndex = 0
         this.lastTime = this.playbackFile.startTime
         this.combineWithCurrentCommand = ''
-        this.play()
+        this.play() 
+        this.logIfVerbose('Repeating')
     }
     checkForWaitFor (){
         if (this.waitFor === undefined){
@@ -83,13 +104,13 @@ class CommandHistoryPlayer {
     }
     scheduleNextAction (){
         if (this.state === 'playing' && this.actionIndex < this.playbackFile.userInputs.length){
-            console.log('time till next action', this.playbackFile.userInputs[this.actionIndex].time - this.lastTime)
+            this.logIfVerbose('time till next action', this.playbackFile.userInputs[this.actionIndex].time - this.lastTime)
             setTimeout(() => {
                 this.runNextAction()
             }, this.playbackFile.userInputs[this.actionIndex].time - this.lastTime)
         }
         else {
-            console.log('All actions from', this.originalFilePath, 'have been run. Use the repeat method to repeat')
+            this.logIfVerbose('All actions from', this.originalFilePath, 'have been run. Use the repeat method to repeat')
         }
     }
     runAllNow (){
@@ -100,7 +121,7 @@ class CommandHistoryPlayer {
     runNextAction () {
         if (this.state === 'playing'){
             let currentCommandInfo = this.playbackFile.userInputs[this.actionIndex]
-            console.log('running action', currentCommandInfo)
+            logIfVerbose('running action', currentCommandInfo)
             if (currentCommandInfo.input.includes('historyStream')){
                 this.evaluateCommand(this.playbackFile)
             }
@@ -143,78 +164,41 @@ class CommandHistoryPlayer {
         this.waitFor = variableName
         this.waitingFor = command
     }
-    checkForEndVariableName (command, variableName){
-        let nextCommand = this.playbackFile.userInputs[this.actionIndex + 1].input
-        console.log('Checking for end variable', variableName, nextCommand)
-        console.log(nextCommand.includes(variableName + '.default'))
-        if (nextCommand.includes(variableName + '.default') === true){
-            console.log('found end variable')
-            let reformatedCommand = this.reformDefiningVariables(nextCommand)
-            return nextCommand.slice(0, command.indexOf('='))
-        }
-    }
     tryImportingDependencies (command){
          let libraryName = command.slice(command.indexOf('(') + 1, command.indexOf(')'))
          let variableName = command.slice(0, command.indexOf('=')).replace(/\s/g, '')
     //remove space helped by chatgpt
-//         console.log('importing modules')
+        this.logIfVerbose('importing modules')
 //         let importInString = variableName + "= await import('" + libraryName +" ')"
 //         fs.writeFileSync('importing-library.js', command)
 //         (1, eval)(".load ./importing-library.js")
         let loadingFunc = new Function ('return require(' + libraryName + ')')
          global[variableName] = loadingFunc()
-//         let endVariableName = this.checkForEndVariableName(command, variableName)
-//         try{
-//             if ((1, eval)(variableName) !== undefined){
-//                 return true
-//             }
-//         }catch{}
-//         try{
-//             if (endVariableName === undefined){
-//                 console.log('trying require to import library: ', '(' + variableName + ' = require(' + libraryName + '))')
-//                 (1, eval)('(' + variableName + ' = require(' + libraryName + '))')
-//                 console.log('succeded with importing with require')
-//             }
-//             else {
-//                 console.log('trying require to import library: ', '(' + endVariableName + ' = require(' + libraryName + '))')
-//                 (1, eval)('(' + endVariableName + ' = require(' + libraryName + '))')
-//                 console.log('succeded with importing with require')
-//                 this.playbackFile.userInputs.splice(this.actionIndex + 1, 1)
-//             }
-//         catch{
-//             try{
-//                 (1, eval)('(() => {import(' + libraryName + ').then(module => {' + variableName + '= module.default || module})})()')
-//             }
-//             catch{
-//                 this.promptUserToManuallyImportLibrary(command, variableName)
-//             }
-//         }
-//     }
         }
     preEvaluateChecks (command){
         if (command.slice(0, 6).includes('.load') || command.slice(0, 2) === '//'){
             return false
         }
          else if (command.slice(0,9).includes('function ')){
-             console.log('reformating function')
+             this.logIfVerbose('reformating function')
              this.combineWithCurrentCommand = command + '\n'
              return false
          }
         else if (this.combineWithCurrentCommand.slice(0, 6) === 'class '){
-            this.combineWithCurrentCommand = this.eformatDefiningClasses(command)
+            this.combineWithCurrentCommand = this.reformatDefiningClasses(command)
             return false
          let variableName = command.slice(0, command.indexOf('=')).replace(/\s/g, '')
     //remove space helped by chatgpt
         }
         else if (this.combineWithCurrentCommand === ''){
-            console.log('reformating defining statement')
+            this.logIfVerbose('reformating defining statement')
             this.combineWithCurrentCommand = this.reformDefiningVariables(command)
         }
         else{
             this.combineWithCurrentCommand += command + '\n';
         }
-        console.log('combineWithCurrentCommand', this.combineWithCurrentCommand, typeof this.combineWithCurrentCommand)
-        console.log('testing if importing modules: ', this.combineWithCurrentCommand.includes('await import'), this.combineWithCurrentCommand)
+        this.logIfVerbose('combineWithCurrentCommand', this.combineWithCurrentCommand, typeof this.combineWithCurrentCommand)
+        this.logIfVerbose('testing if importing modules: ', this.combineWithCurrentCommand.includes('await import'), this.combineWithCurrentCommand)
         if (this.combineWithCurrentCommand.includes('await import') === true){
             this.tryImportingDependencies(this.combineWithCurrentCommand)
             this.combineWithCurrentCommand = ''
@@ -226,23 +210,23 @@ class CommandHistoryPlayer {
     }
     evaluateCommand (command){
         let checkStatus = this.preEvaluateChecks(command)
-        console.log('check status', checkStatus)
+        this.logIfVerbose('check status', checkStatus)
         if (checkStatus === false){
             return false
         }
-        console.log('gonna try:', this.combineWithCurrentCommand)
+        this.logIfVerbose('gonna try:', this.combineWithCurrentCommand)
         try {
-//           console.log('evaluating:', command, this.combineWithCurrentCommand);
+//           this.logIfVerbose('evaluating:', command, this.combineWithCurrentCommand);
 //           eval(JSON.stringify(this.combineWithCurrentCommand));
 //           I got this method of using eval from: https://stackoverflow.com/a/23699187/19515980
               (true, eval)(this.combineWithCurrentCommand)
-//           console.log('evaluated:', this.combineWithCurrentCommand)
+//           this.logIfVerbose('evaluated:', this.combineWithCurrentCommand)
         this.combineWithCurrentCommand = '';
-                console.log('command worked')
+                this.logIfVerbose('command worked')
         } catch (error) {
           if (error instanceof SyntaxError) {
             // Incomplete command
-           console.log('command incomplete', this.combineWithCurrentCommand)
+           this.logIfVerbose('command incomplete', this.combineWithCurrentCommand)
           } else {
             console.log(error);
           }
@@ -254,7 +238,7 @@ module.exports = {
     CommandHistoryPlayer
 }
 
-let historyPlayer1 = new CommandHistoryPlayer('./27May-repl-history--.txt')
+// let historyPlayer = new p.playback.CommandHistoryPlayer('./27May-repl-history-1-.txt')
 //console.log('running action', currentCommandInfo)
 
 // historyPlayer1 = new CommandHistoryPlayer('./15Aug-repl-history-9-.txt')
@@ -269,7 +253,7 @@ let historyPlayer1 = new CommandHistoryPlayer('./27May-repl-history--.txt')
 // 
 //historyPlayer1.stop()
 
-historyPlayer1.runAllNow()
+// historyPlayer.runAllNow()
 
 // let testFunc = 'function testingIfFunctionsWork(arg) { console.log("hi", arg); console.log("Function testing success"); return arg; }';
 // 
@@ -329,4 +313,5 @@ historyPlayer1.runAllNow()
 // 
 // hi = requiringLib2('array-toolkit')
 
-hi = loadPlaybackFile('./27May-repl-history--.txt')
+// hi = loadPlaybackFile('./27May-repl-history--.txt')
+// p = require('repl-recording+playback')
