@@ -74,7 +74,9 @@ function saveInputs() {
 
 // Event listener for when the user closes the program
 process.on('exit', () => {
-  saveHistoryToFile()
+    if (historyStream.userInputs.length > 0){
+        saveHistoryToFile()
+    }
 });
 
 //https://stackoverflow.com/a/49961675/19515980
