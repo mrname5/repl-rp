@@ -92,6 +92,11 @@ class CommandHistoryPlayer {
             console.log('All actions from', this.originalFilePath, 'have been run. Use the repeat method to repeat')
         }
     }
+    runAllNow (){
+        this.playbackFile.userInputs.forEach(x => {
+            this.evaluateCommand(x.input)
+        })
+    }
     runNextAction () {
         if (this.state === 'playing'){
             let currentCommandInfo = this.playbackFile.userInputs[this.actionIndex]
@@ -249,7 +254,7 @@ module.exports = {
     CommandHistoryPlayer
 }
 
-// let historyPlayer1 = new CommandHistoryPlayer('./10June-repl-history-2-.txt')
+let historyPlayer1 = new CommandHistoryPlayer('./27May-repl-history--.txt')
 //console.log('running action', currentCommandInfo)
 
 // historyPlayer1 = new CommandHistoryPlayer('./15Aug-repl-history-9-.txt')
@@ -263,6 +268,8 @@ module.exports = {
 // historyPlayer1.repeat()
 // 
 //historyPlayer1.stop()
+
+historyPlayer1.runAllNow()
 
 // let testFunc = 'function testingIfFunctionsWork(arg) { console.log("hi", arg); console.log("Function testing success"); return arg; }';
 // 
@@ -321,3 +328,5 @@ module.exports = {
 // 
 // 
 // hi = requiringLib2('array-toolkit')
+
+hi = loadPlaybackFile('./27May-repl-history--.txt')
