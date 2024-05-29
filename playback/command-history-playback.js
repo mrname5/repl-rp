@@ -50,7 +50,7 @@ class CommandHistoryPlayer {
         this.lastTime = this.playbackFile.startTime
         this.combineWithCurrentCommand = ''
         this.waitFor = undefined
-        this.verbosity = false
+        this.verbosity = true
     }
     logIfVerbose (){
         if (this.verbosity === false){
@@ -121,7 +121,7 @@ class CommandHistoryPlayer {
     runNextAction () {
         if (this.state === 'playing'){
             let currentCommandInfo = this.playbackFile.userInputs[this.actionIndex]
-            logIfVerbose('running action', currentCommandInfo)
+            this.logIfVerbose('running action', currentCommandInfo)
             if (currentCommandInfo.input.includes('historyStream')){
                 this.evaluateCommand(this.playbackFile)
             }
@@ -148,8 +148,9 @@ class CommandHistoryPlayer {
     }
     reformatDefiningClasses (command){
         let endOfName = command.indexOf('{') - 1
-        let className = command.slice(5, endOfName)
-        return className + '=' + command + '\n'
+        let className = command.slice(5, endOfName).trim()
+        console.log('CLassName: ', className)
+        global[className] = new Function('return( ' + command + ')')()
         //Idea of reformatting classes from: https://stackoverflow.com/a/39299283
     }
     changeCommandToAsyncEval (command){
@@ -174,7 +175,7 @@ class CommandHistoryPlayer {
 //         (1, eval)(".load ./importing-library.js")
         let loadingFunc = new Function ('return require(' + libraryName + ')')
          global[variableName] = loadingFunc()
-        }
+    }
     preEvaluateChecks (command){
         if (command.slice(0, 6).includes('.load') || command.slice(0, 2) === '//'){
             return false
@@ -184,12 +185,12 @@ class CommandHistoryPlayer {
              this.combineWithCurrentCommand = command + '\n'
              return false
          }
-        else if (this.combineWithCurrentCommand.slice(0, 6) === 'class '){
-            this.combineWithCurrentCommand = this.reformatDefiningClasses(command)
-            return false
-         let variableName = command.slice(0, command.indexOf('=')).replace(/\s/g, '')
-    //remove space helped by chatgpt
-        }
+//         else if (this.combineWithCurrentCommand.slice(0, 6) === 'class '){
+//             this.combineWithCurrentCommand = this.reformatDefiningClasses(command)
+//             return false
+//          let variableName = command.slice(0, command.indexOf('=')).replace(/\s/g, '')
+//     //remove space helped by chatgpt
+//         }
         else if (this.combineWithCurrentCommand === ''){
             this.logIfVerbose('reformating defining statement')
             this.combineWithCurrentCommand = this.reformDefiningVariables(command)
@@ -221,15 +222,20 @@ class CommandHistoryPlayer {
 //           I got this method of using eval from: https://stackoverflow.com/a/23699187/19515980
               (true, eval)(this.combineWithCurrentCommand)
 //           this.logIfVerbose('evaluated:', this.combineWithCurrentCommand)
-        this.combineWithCurrentCommand = '';
+            if (this.combineWithCurrentCommand.split('\n')[0].trim().slice(0, 6).includes( 'class')){
+                this.logIfVerbose('Class detected')
+                this.reformatDefiningClasses(this.combineWithCurrentCommand)
+            }
+            this.combineWithCurrentCommand = '';
                 this.logIfVerbose('command worked')
         } catch (error) {
           if (error instanceof SyntaxError) {
             // Incomplete command
            this.logIfVerbose('command incomplete', this.combineWithCurrentCommand)
           } else {
+            this.combineWithCurrentCommand = ''
             console.log(error);
-          }
+            }
         }
     }
 }
@@ -238,20 +244,24 @@ module.exports = {
     CommandHistoryPlayer
 }
 
-// let historyPlayer = new p.playback.CommandHistoryPlayer('./27May-repl-history-1-.txt')
+
+// let historyPlayer = new p.playback.CommandHistoryPlayer('/home/steve/Documents/Code/code-recording-and-playback/28May-repl-history-2-.txt')
+//let historyPlayer = new p.playback.CommandHistoryPlayer('./28May-repl-history-2-.txt')
+
 //console.log('running action', currentCommandInfo)
 
 // historyPlayer1 = new CommandHistoryPlayer('./15Aug-repl-history-9-.txt')
 // historyPlayer1 = new CommandHistoryPlayer('./15Jan-repl-history--.txt')
 // historyPlayer1 = new CommandHistoryPlayer('./libraries-to-import.txt')
 // historyPlayer1 = new CommandHistoryPlayer('./15Jan-repl-history-1-.txt')
-// historyPlayer1.play()
+// historyPlayer.play()
+// historyPlayer.verbosity = true
 // 
 // historyPlayer1.stop()
 // 
-// historyPlayer1.repeat()
+// historyPlayer.repeat()
 // 
-//historyPlayer1.stop()
+//historyPlayer.stop()
 
 // historyPlayer.runAllNow()
 
@@ -306,7 +316,7 @@ module.exports = {
 // 
 // 
 // function requiringLib2 (libraryName){
-//         let loadingFunc = new Function ('return require("' + libraryName + '")')
+//  let p = require('/home/steve/Documents/Code/code-recording-and-playback/src-export.js')       let loadingFunc = new Function ('return require("' + libraryName + '")')
 //     return loadingFunc()
 // }
 // 
@@ -314,4 +324,4 @@ module.exports = {
 // hi = requiringLib2('array-toolkit')
 
 // hi = loadPlaybackFile('./27May-repl-history--.txt')
-// p = require('repl-recording+playback')
+// let p = require('/home/steve/Documents/Code/code-recording-and-playback/src-export.js')

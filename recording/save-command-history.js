@@ -57,7 +57,7 @@ function saveInputs() {
     });
     lastLineSave = repl.repl.history[currentIndex];
     try{
-        if (lastLineSave.slice(0, 6) === '.load ' && fs.existsSync(lastLineSave.slice(6)) === true){
+        if ((lastLineSave.slice(0, 6) === '.load ' && fs.existsSync(lastLineSave.slice(6)) === true) || currentIndex > 0){
 //             console.log('loading file detected', currentIndex, repl.repl.history[0])
             for (let i = currentIndex; i > 0; i--) {
                 currentIndex -= 1
