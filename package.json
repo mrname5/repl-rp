@@ -1,0 +1,29 @@
+{
+  "name": "repl-rp",
+  "description": "Recording and playing back nodejs repl commands",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrname5/"
+  },
+  "keywords": [
+    "repl"
+  ],
+  "author": "Steve Wang",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/mrname5"
+  },
+  "homepage": "https://github.com/mrname5",
+    "exports": {
+    ".": {
+      "require": "./src-export.js",
+      "import": "./es-export.mjs"
+    }
+  },
+    "files": [
+    "playback",
+    "recording"
+  ]
+}
+

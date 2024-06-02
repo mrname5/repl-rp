@@ -1,4 +1,4 @@
-# repl-recording+playback
+# repl-rp (repl-recording+playback)
 
 Playback your Nodejs repl history like a video file.
 
@@ -13,7 +13,7 @@ Requires: Nodejs
 1. Install with NPM:
 
 ```
-npm install repl-recording+playback
+npm install repl-rp
 ```
 
 2. Install with Github:
@@ -24,11 +24,11 @@ git pull
 ## Import into code:
 
 ```
-const P = require('repl-recording+playback')
+const P = require('repl-rp')
 ```
 OR
 ```
-const P = await import('repl-recording+playback')
+const P = await import('repl-rp')
 ```
 
 ## Recording

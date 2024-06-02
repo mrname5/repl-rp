@@ -11,7 +11,6 @@ fs.readdir(process.cwd(), (err, files) => {
     files.forEach(x=>{
         if (x.includes(day.getDate() + months[day.getMonth()] + '-repl-history-') == true){
             backups+=1
-            //console.log('hi')
         }
     })
     if (backups == 0){
@@ -29,20 +28,6 @@ function saveHistoryToFile (){
         historyStream.endTime = new Date().getTime()
         fs.writeFileSync(day.getDate() + months[day.getMonth()] + '-repl-history-'+ backups + '-' + '.txt' , JSON.stringify(historyStream))
 }
-
-// function saveInputs (){
-//     //console.log('saving inputs', repl.repl.history.indexOf(lastLineSave))
-//   if (repl.repl.history.indexOf(lastLineSave) <= 0){
-//       historyStream.userInputs.push({time: new Date().getTime(), input: repl.repl.history[0]}); // Append command to history
-//   }
-//     else{
-//         let lastSaveIndex = repl.repl.history.indexOf(lastLineSave)
-//         for (let i = 0; i < lastSaveIndex; i++) {
-//               historyStream.userInputs.push({time: new Date().getTime(), input: repl.repl.history[lastSaveIndex - 1 - i]}); // Append command to history
-//         }
-//     }
-//     lastLineSave = repl.repl.history[0]
-// }
 
 function saveInputs() {
   let currentIndex = repl.repl.history.indexOf(lastLineSave) - 1
