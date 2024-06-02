@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mrname5/"
+    "url": "git+https://github.com/mrname5/repl-rp"
   },
   "keywords": [
     "repl"
@@ -12,9 +12,9 @@
   "author": "Steve Wang",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/mrname5"
+    "url": "https://github.com/mrname5/repl-rp/issues"
   },
-  "homepage": "https://github.com/mrname5",
+  "homepage": "https://github.com/mrname5/repl-rp",
     "exports": {
     ".": {
       "require": "./src-export.js",
