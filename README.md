@@ -60,7 +60,7 @@ Use the CommandHistoryPlayer class
 It takes once argument the file path in string form:
 
 ```
-let historyPlayer = new P.CommandHistoryPlayer(fileName)
+let historyPlayer = new P.playback.CommandHistoryPlayer(fileName)
 ```
 
 To start playback with relative time:
