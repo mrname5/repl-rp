@@ -23,7 +23,9 @@
   },
     "files": [
     "playback",
-    "recording"
+    "recording",
+    "src-export.js",
+    "es-export.mjs"
   ]
 }
 
