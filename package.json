@@ -1,10 +1,10 @@
 {
   "name": "repl-rp",
   "description": "Recording and playing back nodejs repl commands",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mrname5/repl-rp"
+    "url": "git+https://github.com/mrname5/repl-rp.git"
   },
   "keywords": [
     "repl"
@@ -15,17 +15,16 @@
     "url": "https://github.com/mrname5/repl-rp/issues"
   },
   "homepage": "https://github.com/mrname5/repl-rp",
-    "exports": {
+  "exports": {
     ".": {
       "require": "./src-export.js",
       "import": "./es-export.mjs"
     }
   },
-    "files": [
+  "files": [
     "playback",
     "recording",
     "src-export.js",
     "es-export.mjs"
   ]
 }
-
