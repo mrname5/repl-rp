@@ -1,6 +1,6 @@
 # repl-rp (repl-recording+playback)
 
-Playback your Nodejs repl history like a video file.
+Playback your Nodejs repl history like a video file or a memory.
 
 Initial author: Steve Wang (stevesg168@gmail.com)
 
@@ -18,7 +18,7 @@ npm install repl-rp
 
 2. Install with Github:
 ```
-git pull 
+git pull https://github.com/mrname5/repl-rp.git
 ```
 
 ## Import into code:
@@ -40,13 +40,13 @@ P.recording
 
 ### Start Recording:
 ```
-P.recording.startRecording
+P.recording.startRecording()
 ```
 Then start typing and the contents will be recorded. Will be saved to a new txt file which will contain the current date + repl-history and the file number.
 
 ### Stop Recording:
 ```
-P.recording.stopRecording
+P.recording.stopRecording()
 ```
 Recording will be paused but can always be resumed with start recording command.
 
