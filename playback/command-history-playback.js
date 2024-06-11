@@ -22,8 +22,8 @@ function getAbsoluteFilePath (filePath){
 }
 
 function loadPlaybackFile (filePath){
-    let absoluteFilePath = getAbsoluteFilePath(filePath)
-    return JSON.parse(fs.readFileSync(absoluteFilePath, 'utf-8'))
+//     let absoluteFilePath = getAbsoluteFilePath(filePath)
+    return JSON.parse(fs.readFileSync(filePath, 'utf-8'))
 }
 
 class CommandHistoryPlayer {
@@ -31,10 +31,26 @@ class CommandHistoryPlayer {
         this.originalFilePath = filePath
         this.playbackFile = loadPlaybackFile(filePath)
         this.actionIndex = 0
+        this.convertTimeToRelative()
         this.lastTime = this.playbackFile.startTime
         this.combineWithCurrentCommand = ''
         this.waitFor = undefined
         this.verbosity = false
+        this.speed = 1
+    }
+    convertTimeToRelative() {
+        this.originalFile = JSON.parse(JSON.stringify(this.playbackFile))
+        this.playbackFile.startTime = 0
+        this.playbackFile.userInputs = this.playbackFile.userInputs.map((x, i) => {
+            if (i === 0){
+                x.time -= this.originalFile.startTime
+            }
+            else {
+                x.time -= this.originalFile.userInputs[i - 1].time
+            }
+            return x
+        })
+        this.playbackFile.endTime -= this.originalFile.userInputs[this.originalFile.userInputs.length - 1].time
     }
     logIfVerbose (){
         if (this.verbosity === false){
@@ -91,7 +107,7 @@ class CommandHistoryPlayer {
             this.logIfVerbose('time till next action', this.playbackFile.userInputs[this.actionIndex].time - this.lastTime)
             setTimeout(() => {
                 this.runNextAction()
-            }, this.playbackFile.userInputs[this.actionIndex].time - this.lastTime)
+            }, (this.playbackFile.userInputs[this.actionIndex].time - this.lastTime) / this.speed)
         }
         else {
             this.logIfVerbose('All actions from', this.originalFilePath, 'have been run. Use the repeat method to repeat')

@@ -82,3 +82,8 @@ To repeat run this:
 ```
 historyPlayer.repeat()
 ```
+
+To change speed of playback, check the speed variable in CommandHistoryPlayer. The bigger the number the faster the speed. Original speed is 1.
+```
+historyPlayer.speed = 2
+```
